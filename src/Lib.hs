@@ -10,11 +10,17 @@ height = 200
 
 header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 
-color x y = show (x + y) ++ " 0 0"
+pixel :: Int -> Int -> [Int]
+pixel x y = [x + y, x, y]
 
-rows = map (\y -> intercalate " " $ map (\x -> color x y) [1..width]) [1..height]
+row :: Int -> [Int]
+row y = concat $ map (pixel y) [1 .. width]
 
-body = intercalate " " rows
+image :: [Int]
+image = concat $ map row [1 .. height]
+
+body :: String
+body = intercalate " " $ map show $ image
 
 content = header ++ body
 
