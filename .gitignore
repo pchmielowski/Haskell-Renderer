@@ -1,3 +1,4 @@
 .stack-work/
 raytracer.cabal
 *~
+*.ppm
