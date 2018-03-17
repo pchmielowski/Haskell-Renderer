@@ -3,6 +3,10 @@ module Lib
   ) where
 
 import Data.List
+import Data.Vec3
+
+cameraSource :: TVec3
+cameraSource = (0, 0, 0)
 
 width = 300
 
