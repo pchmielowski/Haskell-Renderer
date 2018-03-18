@@ -85,9 +85,10 @@ cameraRay x y = Ray cameraSource $ cameraTarget x y
 
 closest :: [Intersection] -> Maybe Intersection
 closest [] = Nothing
-closest points = Just $ minimumBy (comparing distanceFromCamera) points
+closest intersections =
+  Just $ minimumBy (comparing distanceFromOrigin) intersections
   where
-    distanceFromCamera intersection =
+    distanceFromOrigin intersection =
       norm (cameraSource <-> (point intersection))
 
 intersections :: Int -> Int -> [Sphere] -> [Intersection]
