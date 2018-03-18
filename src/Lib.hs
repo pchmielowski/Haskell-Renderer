@@ -35,7 +35,12 @@ data Sphere = Sphere
   , radius :: Int
   }
 
-spheres = [Sphere (0, -5, -30) 1, Sphere (0, 5, -30) 2]
+spheres =
+  [ Sphere (3, 3, -30) 1
+  , Sphere (-3, 3, -30) 2
+  , Sphere (3, -3, -20) 1
+  , Sphere (-3, -3, -30) 3
+  ]
 
 light = (0, 0, -30) :: Vector
 
