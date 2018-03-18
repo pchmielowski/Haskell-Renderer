@@ -83,7 +83,7 @@ pixel x y = take 3 $ repeat $ sum $ map color spheres
     color sphere =
       case intersection x y sphere of
         Just (t0, _) ->
-          let q = -((pointHit t0) .* (lightDirection t0))
+          let q = ((pointHit t0) .* (lightDirection t0))
           in max 0 $ round $ q * 255
         Nothing -> 0
     pointHit :: Double -> Vector
@@ -92,7 +92,7 @@ pixel x y = take 3 $ repeat $ sum $ map color spheres
     lightDirection t0 = normalize $ light <-> (pointHit t0)
 
 row :: Int -> [Int]
-row y = concat $ map (pixel y) [1 .. width]
+row y = concat $ map (\x -> pixel x y) [1 .. width]
 
 image :: [Int]
 image = concat $ map row [1 .. height]
