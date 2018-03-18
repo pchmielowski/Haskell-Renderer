@@ -5,7 +5,9 @@ module Lib
 import Data.List
 import Data.Vec3
 
-cameraSource :: TVec3
+type Vector = TVec3
+
+cameraSource :: Vector
 cameraSource = (0, 0, 0)
 
 -- float angle = tan(M_PI * 0.5 * fov / 180.);
@@ -13,7 +15,7 @@ cameraSource = (0, 0, 0)
 -- float yy = (1 - 2 * ((y + 0.5) * invHeight)) * angle;
 -- Vec3f raydir(xx, yy, -1);
 -- raydir.normalize(); 
-cameraTarget :: Int -> Int -> TVec3
+cameraTarget :: Int -> Int -> Vector
 cameraTarget x y =
   normalize
     ( (2 * ((xf + 0.5) / wf) - 1) * angle * wf / hf
@@ -29,13 +31,13 @@ cameraTarget x y =
     hf = fromIntegral height
 
 data Sphere = Sphere
-  { center :: TVec3
+  { center :: Vector
   , radius :: Int
   }
 
-sphere = Sphere (0, 0, -30) 1
+sphere = Sphere (0, -5, -30) 1
 
-light = (30, 20, -30) :: TVec3
+light = (30, 20, -10) :: Vector
 
 -- Vec3f l = center - rayorig;
 -- float tca = l.dot(raydir);
@@ -53,9 +55,11 @@ isPoint x y =
     else Nothing
   where
     tca = l .* (cameraTarget x y)
-    r2 = fromIntegral ((radius sphere) * (radius sphere))
+    r2 =
+      let r = radius sphere
+      in fromIntegral $ r * r
     d2 = l .* l - (tca * tca)
-    l = (center sphere) <-> cameraSource :: TVec3
+    l = (center sphere) <-> cameraSource :: Vector
     thc = sqrt $ r2 - d2
     t0 = tca - thc
     t1 = tca + thc
@@ -79,10 +83,10 @@ pixel x y = [color, color, color]
     color =
       case (isPoint x y) of
         Just (t0, _) ->
-          let q = (pointHit t0) .* (lightDirection t0)
+          let q = -((pointHit t0) .* (lightDirection t0))
           in max 0 $ round $ q * 255
         Nothing -> 0
-    pointHit :: Double -> TVec3
+    pointHit :: Double -> Vector
     pointHit t0 = cameraSource <+> (cameraTarget x y .^ t0)
     normalHit t0 = normalize $ pointHit t0 <-> light
     lightDirection t0 = normalize $ light <-> (pointHit t0)
