@@ -38,11 +38,12 @@ spheres =
 
 light = (0, 0, -50) :: Vector
 
--- returns the distance from ray origin to the intersection point or Nothing
-intersection :: Vector -> Sphere -> Maybe Double
+-- returns the intersection point or Nothing
+intersection :: Vector -> Sphere -> Maybe Vector
 intersection rayDirection sphere =
   if tc >= 0 && d2 <= r2
     then Just $
+         pointAt $
          let t = tc - thc
          in if t > 0
               then t
@@ -54,8 +55,10 @@ intersection rayDirection sphere =
       let r = radius sphere
       in fromIntegral $ r ^ 2
     d2 = norm l ^ 2 - tc ^ 2 -- d2: squared distance from sphere center to ray
-    l = (center sphere) <-> cameraSource :: Vector -- l: vector from ray origin to sphere center
+    l = (center sphere) <-> rayOrigin :: Vector -- l: vector from ray origin to sphere center
     thc = sqrt $ r2 - d2 -- thc: radius projected on the ray
+    pointAt t = rayOrigin <+> (rayDirection .^ t)
+    rayOrigin = cameraSource -- TODO: maybe take it as parameter
 
 square number = number * number
 
@@ -75,14 +78,12 @@ pixel x y = take 3 $ repeat $ sum $ map color spheres
   where
     color sphere =
       case intersection (cameraTarget x y) sphere of
-        Just t ->
-          let q = ((pointHit t) .* (lightDirection t))
+        Just point ->
+          let q = (point .* (lightDirection point))
           in max 0 $ round $ q * 255
         Nothing -> 0
-    pointHit :: Double -> Vector
-    pointHit t = cameraSource <+> (cameraTarget x y .^ t)
-    normalHit t = normalize $ pointHit t <-> light
-    lightDirection t = normalize $ light <-> (pointHit t)
+    normalHit point = normalize $ point <-> light
+    lightDirection point = normalize $ light <-> point
 
 row :: Int -> [Int]
 row y = concat $ map (\x -> pixel x y) [1 .. width]
