@@ -35,6 +35,8 @@ data Sphere = Sphere
 
 sphere = Sphere (0, 0, -30) 1
 
+light = (10, 0, -30) :: TVec3
+
 -- Vec3f l = center - rayorig;
 -- float tca = l.dot(raydir);
 -- if (tca < 0) return false;
@@ -66,13 +68,25 @@ height = 600
 
 header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 
+-- Vec3f phit = rayorig + raydir * tnear; // point of intersection
+-- Vec3f nhit = phit - sphere->center; // normal at the intersection point
+-- nhit.normalize(); // normalize normal direction
+-- Vec3f lightDirection = spheres[i].center - phit;
+-- lightDirection.normalize(); 
 pixel :: Int -> Int -> [Int]
 pixel x y = [color, color, color]
   where
     color =
       case (isPoint x y) of
-        Just _ -> 255
+        Just (t0, _) ->
+          if (pointHit t0) .* (lightDirection t0) < 0
+            then 255
+            else 0
         Nothing -> 0
+    pointHit :: Double -> TVec3
+    pointHit t0 = cameraSource <+> (cameraTarget x y .^ t0)
+    normalHit t0 = normalize $ pointHit t0 <-> light
+    lightDirection t0 = normalize $ light <-> (pointHit t0)
 
 row :: Int -> [Int]
 row y = concat $ map (pixel y) [1 .. width]
