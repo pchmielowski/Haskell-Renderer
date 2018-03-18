@@ -35,9 +35,9 @@ data Sphere = Sphere
   , radius :: Int
   }
 
-sphere = Sphere (0, -5, -30) 1
+spheres = [Sphere (0, -5, -30) 1, Sphere (0, 5, -30) 2]
 
-light = (30, 20, -10) :: Vector
+light = (0, 0, -30) :: Vector
 
 -- Vec3f l = center - rayorig;
 -- float tca = l.dot(raydir);
@@ -48,8 +48,8 @@ light = (30, 20, -10) :: Vector
 -- t0 = tca - thc;
 -- t1 = tca + thc;
 -- return true;
-intersection :: Int -> Int -> Maybe (Double, Double)
-intersection x y =
+intersection :: Int -> Int -> Sphere -> Maybe (Double, Double)
+intersection x y sphere =
   if tca >= 0 && d2 <= r2
     then Just (t0, t1)
     else Nothing
@@ -78,10 +78,10 @@ header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 -- Vec3f lightDirection = spheres[i].center - phit;
 -- lightDirection.normalize(); 
 pixel :: Int -> Int -> [Int]
-pixel x y = [color, color, color]
+pixel x y = take 3 $ repeat $ sum $ map color spheres
   where
-    color =
-      case intersection x y of
+    color sphere =
+      case intersection x y sphere of
         Just (t0, _) ->
           let q = -((pointHit t0) .* (lightDirection t0))
           in max 0 $ round $ q * 255
