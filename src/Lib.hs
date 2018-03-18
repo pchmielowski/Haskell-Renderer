@@ -80,9 +80,7 @@ pixel x y = [color, color, color]
       case (isPoint x y) of
         Just (t0, _) ->
           let q = (pointHit t0) .* (lightDirection t0)
-          in if q > 0
-               then round $ q * 255
-               else 0
+          in max 0 $ round $ q * 255
         Nothing -> 0
     pointHit :: Double -> TVec3
     pointHit t0 = cameraSource <+> (cameraTarget x y .^ t0)
