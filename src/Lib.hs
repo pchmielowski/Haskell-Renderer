@@ -43,13 +43,20 @@ sphere = Sphere (0, 0, -30) 1
 -- float thc = sqrt(radius2 - d2);
 -- t0 = tca - thc;
 -- t1 = tca + thc;
--- return true; 
-isPoint x y = tca >= 0 && d2 <= r2
+-- return true;
+isPoint :: Int -> Int -> Maybe (Double, Double)
+isPoint x y =
+  if tca >= 0 && d2 <= r2
+    then Just (t0, t1)
+    else Nothing
   where
     tca = l .* (cameraTarget x y)
     r2 = fromIntegral ((radius sphere) * (radius sphere))
     d2 = l .* l - (tca * tca)
     l = (center sphere) <-> cameraSource :: TVec3
+    thc = sqrt $ r2 - d2
+    t0 = tca - thc
+    t1 = tca + thc
 
 square number = number * number
 
@@ -63,9 +70,9 @@ pixel :: Int -> Int -> [Int]
 pixel x y = [color, color, color]
   where
     color =
-      if (isPoint x y)
-        then 255
-        else 0
+      case (isPoint x y) of
+        Just _ -> 255
+        Nothing -> 0
 
 row :: Int -> [Int]
 row y = concat $ map (pixel y) [1 .. width]
