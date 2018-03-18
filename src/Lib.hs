@@ -81,7 +81,7 @@ pixel :: Int -> Int -> [Int]
 pixel x y = [color, color, color]
   where
     color =
-      case (intersection x y) of
+      case intersection x y of
         Just (t0, _) ->
           let q = -((pointHit t0) .* (lightDirection t0))
           in max 0 $ round $ q * 255
