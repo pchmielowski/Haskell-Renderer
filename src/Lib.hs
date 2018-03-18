@@ -3,6 +3,8 @@ module Lib
   ) where
 
 import Data.List
+import Data.Maybe
+import Data.Ord
 import Data.Vec3
 
 type Vector = TVec3
@@ -34,6 +36,7 @@ spheres =
   , Sphere (-3, 3, -30) 2
   , Sphere (3, -3, -40) 1
   , Sphere (-3, -3, -30) 3
+  , Sphere (-3, -3, -40) 1 -- should be hidden behind the previous one
   ]
 
 light = (0, 0, -30) :: Vector
@@ -43,18 +46,24 @@ data Ray = Ray
   , direction :: Vector
   }
 
--- returns the intersection point or Nothing
-intersection :: Ray -> Sphere -> Maybe Vector
+data Intersection = Intersection
+  { point :: Vector
+  , normal :: Vector
+  }
+
+intersection :: Ray -> Sphere -> Maybe Intersection
 intersection ray sphere =
   if tc >= 0 && d2 <= r2
     then Just $
-         pointAt $
-         let t = tc - thc
-         in if t > 0
-              then t
-              else tc + thc
+         let point = pointAt t
+         in Intersection point $ normalize $ point <-> (center sphere)
     else Nothing
   where
+    t =
+      let t0 = tc - thc
+      in if t0 > 0
+           then t0
+           else tc + thc
     tc = l .* (direction ray) -- tc: vector from ray orig to sphere center projected on the ray
     r2 =
       let r = radius sphere
@@ -74,16 +83,22 @@ header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 
 cameraRay x y = Ray cameraSource $ cameraTarget x y
 
-pixel :: Int -> Int -> [Int]
+-- closest :: [Vector] -> Vector
+-- closest points =
+--   minimumBy (comparing (\it -> norm (cameraSource <-> it))) $ points
+
+-- intersections :: Int -> Int -> [Sphere] -> [Vector]
+-- intersections x y spheres =
+--   catMaybes $ map (intersection (cameraRay x y)) spheres pixel :: Int -> Int -> [Int]
+
 pixel x y = take 3 $ repeat $ sum $ map color spheres
   where
     color sphere =
       case intersection (cameraRay x y) sphere of
-        Just point ->
-          let intensity = normal point (center sphere) .* (lightDirection point)
+        Just i ->
+          let intensity = (normal i) .* (lightDirection (point i))
           in max 0 $ round $ intensity * 255
         Nothing -> 0
-    normal point c = normalize $ point <-> c
     lightDirection point = normalize $ light <-> point
 
 row :: Int -> [Int]
