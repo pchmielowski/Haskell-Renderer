@@ -48,8 +48,8 @@ light = (30, 20, -10) :: Vector
 -- t0 = tca - thc;
 -- t1 = tca + thc;
 -- return true;
-isPoint :: Int -> Int -> Maybe (Double, Double)
-isPoint x y =
+intersection :: Int -> Int -> Maybe (Double, Double)
+intersection x y =
   if tca >= 0 && d2 <= r2
     then Just (t0, t1)
     else Nothing
@@ -81,7 +81,7 @@ pixel :: Int -> Int -> [Int]
 pixel x y = [color, color, color]
   where
     color =
-      case (isPoint x y) of
+      case (intersection x y) of
         Just (t0, _) ->
           let q = -((pointHit t0) .* (lightDirection t0))
           in max 0 $ round $ q * 255
