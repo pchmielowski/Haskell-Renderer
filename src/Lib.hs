@@ -35,7 +35,7 @@ data Sphere = Sphere
 
 sphere = Sphere (0, 0, -30) 1
 
-light = (10, 0, -30) :: TVec3
+light = (30, 20, -30) :: TVec3
 
 -- Vec3f l = center - rayorig;
 -- float tca = l.dot(raydir);
@@ -79,9 +79,10 @@ pixel x y = [color, color, color]
     color =
       case (isPoint x y) of
         Just (t0, _) ->
-          if (pointHit t0) .* (lightDirection t0) < 0
-            then 255
-            else 0
+          let q = (pointHit t0) .* (lightDirection t0)
+          in if q > 0
+               then round $ q * 255
+               else 0
         Nothing -> 0
     pointHit :: Double -> TVec3
     pointHit t0 = cameraSource <+> (cameraTarget x y .^ t0)
