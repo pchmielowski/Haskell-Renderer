@@ -84,13 +84,11 @@ header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 cameraRay x y = Ray cameraSource $ cameraTarget x y
 
 closest :: [Intersection] -> Maybe Intersection
-closest points =
-  if null points
-    then Nothing
-    else Just $
-         minimumBy
-           (comparing (\it -> norm (cameraSource <-> (point it))))
-           points
+closest [] = Nothing
+closest points = Just $ minimumBy (comparing distanceFromCamera) points
+  where
+    distanceFromCamera intersection =
+      norm (cameraSource <-> (point intersection))
 
 intersections :: Int -> Int -> [Sphere] -> [Intersection]
 intersections x y spheres =
