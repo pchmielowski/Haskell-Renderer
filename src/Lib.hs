@@ -38,7 +38,7 @@ data Sphere = Sphere
 spheres =
   [ Sphere (3, 3, -30) 1
   , Sphere (-3, 3, -30) 2
-  , Sphere (3, -3, -20) 1
+  , Sphere (3, -3, -40) 1
   , Sphere (-3, -3, -30) 3
   ]
 
@@ -53,10 +53,10 @@ light = (0, 0, -30) :: Vector
 -- t0 = tca - thc;
 -- t1 = tca + thc;
 -- return true;
-intersection :: Int -> Int -> Sphere -> Maybe (Double, Double)
+intersection :: Int -> Int -> Sphere -> Maybe Double
 intersection x y sphere =
   if tca >= 0 && d2 <= r2
-    then Just (t0, t1)
+    then Just $ max t0 t1
     else Nothing
   where
     tca = l .* (cameraTarget x y)
@@ -87,14 +87,14 @@ pixel x y = take 3 $ repeat $ sum $ map color spheres
   where
     color sphere =
       case intersection x y sphere of
-        Just (t0, _) ->
-          let q = ((pointHit t0) .* (lightDirection t0))
+        Just t ->
+          let q = -((pointHit t) .* (lightDirection t))
           in max 0 $ round $ q * 255
         Nothing -> 0
     pointHit :: Double -> Vector
-    pointHit t0 = cameraSource <+> (cameraTarget x y .^ t0)
-    normalHit t0 = normalize $ pointHit t0 <-> light
-    lightDirection t0 = normalize $ light <-> (pointHit t0)
+    pointHit t = cameraSource <+> (cameraTarget x y .^ t)
+    normalHit t = normalize $ pointHit t <-> light
+    lightDirection t = normalize $ light <-> (pointHit t)
 
 row :: Int -> [Int]
 row y = concat $ map (\x -> pixel x y) [1 .. width]
