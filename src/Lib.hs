@@ -39,8 +39,8 @@ spheres =
 light = (0, 0, -50) :: Vector
 
 -- returns the distance from ray origin to the intersection point or Nothing
-intersection :: Int -> Int -> Sphere -> Maybe Double
-intersection x y sphere =
+intersection :: Vector -> Sphere -> Maybe Double
+intersection rayDirection sphere =
   if tc >= 0 && d2 <= r2
     then Just $
          let t = tc - thc
@@ -49,7 +49,7 @@ intersection x y sphere =
               else tc + thc
     else Nothing
   where
-    tc = l .* (cameraTarget x y) -- tc: vector from ray origin to sphere center projected on the ray
+    tc = l .* rayDirection -- tc: vector from ray origin to sphere center projected on the ray
     r2 =
       let r = radius sphere
       in fromIntegral $ r ^ 2
@@ -74,7 +74,7 @@ pixel :: Int -> Int -> [Int]
 pixel x y = take 3 $ repeat $ sum $ map color spheres
   where
     color sphere =
-      case intersection x y sphere of
+      case intersection (cameraTarget x y) sphere of
         Just t ->
           let q = ((pointHit t) .* (lightDirection t))
           in max 0 $ round $ q * 255
