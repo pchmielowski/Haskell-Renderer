@@ -39,7 +39,7 @@ spheres =
   , Sphere (-3, -3, -40) 1 -- should be hidden behind the previous one
   ]
 
-light = (0, 0, -30) :: Vector
+light = (10, 0, -26) :: Vector
 
 data Ray = Ray
   { orig :: Vector
