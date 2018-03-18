@@ -83,20 +83,26 @@ header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 
 cameraRay x y = Ray cameraSource $ cameraTarget x y
 
--- closest :: [Vector] -> Vector
--- closest points =
---   minimumBy (comparing (\it -> norm (cameraSource <-> it))) $ points
+closest :: [Intersection] -> Maybe Intersection
+closest points =
+  if null points
+    then Nothing
+    else Just $
+         minimumBy
+           (comparing (\it -> norm (cameraSource <-> (point it))))
+           points
 
--- intersections :: Int -> Int -> [Sphere] -> [Vector]
--- intersections x y spheres =
---   catMaybes $ map (intersection (cameraRay x y)) spheres pixel :: Int -> Int -> [Int]
+intersections :: Int -> Int -> [Sphere] -> [Intersection]
+intersections x y spheres =
+  catMaybes $ map (intersection (cameraRay x y)) spheres
 
-pixel x y = take 3 $ repeat $ sum $ map color spheres
+pixel :: Int -> Int -> [Int]
+pixel x y = take 3 $ repeat $ color $ closest $ intersections x y spheres
   where
-    color sphere =
-      case intersection (cameraRay x y) sphere of
-        Just i ->
-          let intensity = (normal i) .* (lightDirection (point i))
+    color intersection =
+      case intersection of
+        Just it ->
+          let intensity = (normal it) .* (lightDirection (point it))
           in max 0 $ round $ intensity * 255
         Nothing -> 0
     lightDirection point = normalize $ light <-> point
