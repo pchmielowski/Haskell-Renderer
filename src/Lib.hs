@@ -46,10 +46,10 @@ sphere = Sphere (0, 0, -30) 1
 -- return true; 
 isPoint x y = tca >= 0 && d2 <= r2
   where
-    r2 = fromIntegral ((radius sphere) * (radius sphere))
-    l = (center sphere) <-> cameraSource :: TVec3
     tca = l .* (cameraTarget x y)
+    r2 = fromIntegral ((radius sphere) * (radius sphere))
     d2 = l .* l - (tca * tca)
+    l = (center sphere) <-> cameraSource :: TVec3
 
 square number = number * number
 
