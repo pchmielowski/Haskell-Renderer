@@ -10,25 +10,19 @@ type Vector = TVec3
 cameraSource :: Vector
 cameraSource = (0, 0, 0)
 
--- float angle = tan(M_PI * 0.5 * fov / 180.);
--- float xx = (2 * ((x + 0.5) * invWidth) - 1) * angle * aspectratio;
--- float yy = (1 - 2 * ((y + 0.5) * invHeight)) * angle;
--- Vec3f raydir(xx, yy, -1);
--- raydir.normalize(); 
 cameraTarget :: Int -> Int -> Vector
 cameraTarget x y =
   normalize
-    ( (2 * ((xf + 0.5) / wf) - 1) * angle * wf / hf
-    , (1 - 2 * (yf + 0.5) / hf) * angle
+    ( (2 * ((x' + 0.5) / width') - 1) * angle * width' / height'
+    , (1 - 2 * (y' + 0.5) / height') * angle
     , -1)
   where
     angle = tan $ pi * 0.5 * fieldOfView / 180
     fieldOfView = 30
-    -- TODO find better way to handle Int -> Double conversion
-    xf = fromIntegral x
-    yf = fromIntegral y
-    wf = fromIntegral width
-    hf = fromIntegral height
+    x' = fromIntegral x
+    y' = fromIntegral y
+    width' = fromIntegral width
+    height' = fromIntegral height
 
 data Sphere = Sphere
   { center :: Vector
