@@ -36,7 +36,7 @@ spheres =
   , Sphere (-3, -3, -30) 3
   ]
 
-light = (0, 0, -30) :: Vector
+light = (0, 0, -50) :: Vector
 
 -- Vec3f l = center - rayorig;
 -- float tca = l.dot(raydir);
@@ -50,7 +50,11 @@ light = (0, 0, -30) :: Vector
 intersection :: Int -> Int -> Sphere -> Maybe Double
 intersection x y sphere =
   if tca >= 0 && d2 <= r2
-    then Just $ max t0 t1
+    then Just $
+         let t = tca - thc
+         in if t > 0
+              then t
+              else tca + thc
     else Nothing
   where
     tca = l .* (cameraTarget x y)
@@ -60,8 +64,6 @@ intersection x y sphere =
     d2 = l .* l - (tca * tca)
     l = (center sphere) <-> cameraSource :: Vector
     thc = sqrt $ r2 - d2
-    t0 = tca - thc
-    t1 = tca + thc
 
 square number = number * number
 
@@ -82,7 +84,7 @@ pixel x y = take 3 $ repeat $ sum $ map color spheres
     color sphere =
       case intersection x y sphere of
         Just t ->
-          let q = -((pointHit t) .* (lightDirection t))
+          let q = ((pointHit t) .* (lightDirection t))
           in max 0 $ round $ q * 255
         Nothing -> 0
     pointHit :: Double -> Vector
