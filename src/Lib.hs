@@ -38,9 +38,14 @@ spheres =
 
 light = (0, 0, -30) :: Vector
 
+data Ray = Ray
+  { orig :: Vector
+  , direction :: Vector
+  }
+
 -- returns the intersection point or Nothing
-intersection :: Vector -> Sphere -> Maybe Vector
-intersection rayDirection sphere =
+intersection :: Ray -> Sphere -> Maybe Vector
+intersection ray sphere =
   if tc >= 0 && d2 <= r2
     then Just $
          pointAt $
@@ -50,15 +55,14 @@ intersection rayDirection sphere =
               else tc + thc
     else Nothing
   where
-    tc = l .* rayDirection -- tc: vector from ray origin to sphere center projected on the ray
+    tc = l .* (direction ray) -- tc: vector from ray orig to sphere center projected on the ray
     r2 =
       let r = radius sphere
       in fromIntegral $ r ^ 2
     d2 = norm l ^ 2 - tc ^ 2 -- d2: squared distance from sphere center to ray
-    l = (center sphere) <-> rayOrigin :: Vector -- l: vector from ray origin to sphere center
+    l = (center sphere) <-> (orig ray) :: Vector -- l: vector from ray orig to sphere center
     thc = sqrt $ r2 - d2 -- thc: radius projected on the ray
-    pointAt t = rayOrigin <+> (rayDirection .^ t)
-    rayOrigin = cameraSource -- TODO: maybe take it as parameter (or the Ray structure)
+    pointAt t = (orig ray) <+> (direction ray .^ t)
 
 square number = number * number
 
@@ -68,16 +72,13 @@ height = 600
 
 header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 
--- Vec3f phit = rayorig + raydir * tnear; // point of intersection
--- Vec3f nhit = phit - sphere->center; // normal at the intersection point
--- nhit.normalize(); // normalize normal direction
--- Vec3f lightDirection = spheres[i].center - phit;
--- lightDirection.normalize(); 
+cameraRay x y = Ray cameraSource $ cameraTarget x y
+
 pixel :: Int -> Int -> [Int]
 pixel x y = take 3 $ repeat $ sum $ map color spheres
   where
     color sphere =
-      case intersection (cameraTarget x y) sphere of
+      case intersection (cameraRay x y) sphere of
         Just point ->
           let intensity = normal point (center sphere) .* (lightDirection point)
           in max 0 $ round $ intensity * 255
