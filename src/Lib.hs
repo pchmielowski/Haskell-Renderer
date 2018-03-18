@@ -38,32 +38,24 @@ spheres =
 
 light = (0, 0, -50) :: Vector
 
--- Vec3f l = center - rayorig;
--- float tca = l.dot(raydir);
--- if (tca < 0) return false;
--- float d2 = l.dot(l) - tca * tca;
--- if (d2 > radius2) return false;
--- float thc = sqrt(radius2 - d2);
--- t0 = tca - thc;
--- t1 = tca + thc;
--- return true;
+-- returns the distance from ray origin to the intersection point or Nothing
 intersection :: Int -> Int -> Sphere -> Maybe Double
 intersection x y sphere =
-  if tca >= 0 && d2 <= r2
+  if tc >= 0 && d2 <= r2
     then Just $
-         let t = tca - thc
+         let t = tc - thc
          in if t > 0
               then t
-              else tca + thc
+              else tc + thc
     else Nothing
   where
-    tca = l .* (cameraTarget x y)
+    tc = l .* (cameraTarget x y) -- tc: vector from ray origin to sphere center projected on the ray
     r2 =
       let r = radius sphere
-      in fromIntegral $ r * r
-    d2 = l .* l - (tca * tca)
-    l = (center sphere) <-> cameraSource :: Vector
-    thc = sqrt $ r2 - d2
+      in fromIntegral $ r ^ 2
+    d2 = norm l ^ 2 - tc ^ 2 -- d2: squared distance from sphere center to ray
+    l = (center sphere) <-> cameraSource :: Vector -- l: vector from ray origin to sphere center
+    thc = sqrt $ r2 - d2 -- thc: radius projected on the ray
 
 square number = number * number
 
