@@ -36,7 +36,7 @@ spheres =
   , Sphere (-3, -3, -30) 3
   ]
 
-light = (0, 0, -50) :: Vector
+light = (0, 0, -30) :: Vector
 
 -- returns the intersection point or Nothing
 intersection :: Vector -> Sphere -> Maybe Vector
@@ -58,7 +58,7 @@ intersection rayDirection sphere =
     l = (center sphere) <-> rayOrigin :: Vector -- l: vector from ray origin to sphere center
     thc = sqrt $ r2 - d2 -- thc: radius projected on the ray
     pointAt t = rayOrigin <+> (rayDirection .^ t)
-    rayOrigin = cameraSource -- TODO: maybe take it as parameter
+    rayOrigin = cameraSource -- TODO: maybe take it as parameter (or the Ray structure)
 
 square number = number * number
 
@@ -79,10 +79,10 @@ pixel x y = take 3 $ repeat $ sum $ map color spheres
     color sphere =
       case intersection (cameraTarget x y) sphere of
         Just point ->
-          let q = (point .* (lightDirection point))
-          in max 0 $ round $ q * 255
+          let intensity = normal point (center sphere) .* (lightDirection point)
+          in max 0 $ round $ intensity * 255
         Nothing -> 0
-    normalHit point = normalize $ point <-> light
+    normal point c = normalize $ point <-> c
     lightDirection point = normalize $ light <-> point
 
 row :: Int -> [Int]
