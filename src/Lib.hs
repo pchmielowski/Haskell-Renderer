@@ -1,11 +1,14 @@
 module Lib
   ( someFunc
+  , add5
   ) where
 
 import Data.List
 import Data.Maybe
 import Data.Ord
 import Data.Vec3
+
+add5 = (5 +)
 
 type Vector = TVec3
 

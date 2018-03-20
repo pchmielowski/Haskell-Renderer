@@ -48,3 +48,7 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - raytracer
+    - HUnit
+    - tasty
+    - tasty-hunit
+
