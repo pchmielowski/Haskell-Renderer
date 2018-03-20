@@ -20,7 +20,7 @@ cameraTarget x y =
     , -1)
   where
     angle = tan $ pi * 0.5 * fieldOfView / 180
-    fieldOfView = 30
+    fieldOfView = 5
     x' = fromIntegral x
     y' = fromIntegral y
     width' = fromIntegral width
@@ -39,7 +39,7 @@ spheres =
   , Sphere (-3, -3, -40) 1 -- should be hidden behind the previous one
   ]
 
-light = (10, 0, -26) :: Vector
+light = (0, 8, -20) :: Vector
 
 data Ray = Ray
   { orig :: Vector
@@ -62,10 +62,7 @@ triangleIntersection ray triangle =
            else if v < 0 || u + v > 1
                   then Nothing
                   else if t > eps
-                         then Just $
-                              Intersection
-                                point
-                                (0, 0, 0) -- TODO calculate normal
+                         then Just $ Intersection point normal
                          else Nothing
   where
     eps = 0.0000001
@@ -80,6 +77,7 @@ triangleIntersection ray triangle =
     v = f * ((direction ray) .* q)
     t = f * (edge2 .* q)
     point = ((orig ray) <+> (direction ray) .^ t)
+    normal = edge1 >< edge2
 
 intersection :: Ray -> Sphere -> Maybe Intersection
 intersection ray sphere =
@@ -129,9 +127,19 @@ triangleIntersections x y =
   catMaybes $ map (triangleIntersection (cameraRay x y)) triangles
   where
     triangles =
-      [ [(-3, 3, -30), (-3, -3, -30), (3, 3, -30)]
-      , [(3, -3, -30), (-3, -3, -30), (3, 3, -30)]
+      [ [(0, 0, z1), (-1, -1, z0), (0, -r, z0)]
+      , [(0, 0, z1), (0, -r, z0), (1, -1, z0)]
+      , [(0, 0, z1), (1, -1, z0), (r, 0, z0)]
+      , [(0, 0, z1), (r, 0, z0), (1, 1, z0)]
+      , [(0, 0, z1), (1, 1, z0), (0, r, z0)]
+      , [(0, 0, z1), (0, r, z0), (-1, 1, z0)]
+      , [(0, 0, z1), (-1, 1, z0), (-r, 0, z0)]
+      , [(0, 0, z1), (-r, 0, z0), (-1, -1, z0)]
       ]
+    r = sqrt 2
+    z1 = -30
+    z0 = z1 - h
+    h = 10
 
 pixel :: Int -> Int -> [Int]
 pixel x y = take 3 $ repeat $ color $ closest $ triangleIntersections x y
@@ -140,7 +148,7 @@ pixel x y = take 3 $ repeat $ color $ closest $ triangleIntersections x y
       case intersection of
         Just it ->
           let intensity = (normal it) .* (lightDirection (point it))
-          in 255 -- max 0 $ round $ intensity * 255
+          in max 0 $ 128 + (round $ intensity * 128)
         Nothing -> 0
     lightDirection point = normalize $ light <-> point
 

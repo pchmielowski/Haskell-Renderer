@@ -1,3 +1,3 @@
 #!/bin/sh
 
-stack build && stack exec raytracer-exe && eog image.ppm
+stack build && stack exec raytracer-exe # && eog image.ppm
