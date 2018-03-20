@@ -26,7 +26,8 @@ cameraTarget x y =
     width' = fromIntegral width
     height' = fromIntegral height
 
-light = (10, 10, -40) :: Vector
+light :: Vector
+light = (10, 10, -40)
 
 data Ray = Ray
   { orig :: Vector
@@ -49,7 +50,7 @@ triangleIntersection ray triangle =
            else if v < 0 || u + v > 1
                   then Nothing
                   else if t > eps
-                         then Just $ Intersection point normal
+                         then Just $ Intersection pnt nrml
                          else Nothing
   where
     eps = 0.0000001
@@ -63,15 +64,19 @@ triangleIntersection ray triangle =
     q = s >< edge1
     v = f * ((direction ray) .* q)
     t = f * (edge2 .* q)
-    point = ((orig ray) <+> (direction ray) .^ t)
-    normal = normalize $ edge1 >< edge2
+    pnt = ((orig ray) <+> (direction ray) .^ t)
+    nrml = normalize $ edge1 >< edge2
 
+width :: Int
 width = 800
 
+height :: Int
 height = 600
 
+header :: String
 header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
 
+cameraRay :: Int -> Int -> Ray
 cameraRay x y = Ray cameraSource $ cameraTarget x y
 
 closest :: [Intersection] -> Maybe Intersection
@@ -82,6 +87,7 @@ closest intersections =
     distanceFromOrigin intersection =
       norm (cameraSource <-> (point intersection))
 
+triangleIntersections :: Int -> Int -> [Intersection]
 triangleIntersections x y =
   catMaybes $ map (triangleIntersection (cameraRay x y)) triangles
   where
@@ -105,10 +111,10 @@ pixel x y = take 3 $ repeat $ color $ closest $ triangleIntersections x y
     color intersection =
       case intersection of
         Just it ->
-          let intensity = (normal it) .* (lightDirection (point it))
+          let intensity = (normal it) .* (lightDirection light (point it))
           in max 0 $ 128 + (round $ intensity * 128)
         Nothing -> 0
-    lightDirection point = normalize $ light <-> point
+    lightDirection = (normalize .) . (<->)
 
 row :: Int -> [Int]
 row y = concat $ map (\x -> pixel x y) [1 .. width]
@@ -119,6 +125,7 @@ image = concat $ map row [1 .. height]
 body :: String
 body = intercalate " " $ map show $ image
 
+content :: String
 content = header ++ body
 
 someFunc :: IO ()
