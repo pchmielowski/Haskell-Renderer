@@ -26,19 +26,6 @@ cameraTarget x y =
     width' = fromIntegral width
     height' = fromIntegral height
 
-data Sphere = Sphere
-  { center :: Vector
-  , radius :: Int
-  }
-
-spheres =
-  [ Sphere (3, 3, -30) 1
-  , Sphere (-3, 3, -30) 2
-  , Sphere (3, -3, -40) 1
-  , Sphere (-3, -3, -30) 3
-  , Sphere (-3, -3, -40) 1 -- should be hidden behind the previous one
-  ]
-
 light = (10, 10, -40) :: Vector
 
 data Ray = Ray
@@ -79,30 +66,6 @@ triangleIntersection ray triangle =
     point = ((orig ray) <+> (direction ray) .^ t)
     normal = normalize $ edge1 >< edge2
 
-intersection :: Ray -> Sphere -> Maybe Intersection
-intersection ray sphere =
-  if tc >= 0 && d2 <= r2
-    then Just $
-         let point = pointAt t
-         in Intersection point $ normalize $ point <-> (center sphere)
-    else Nothing
-  where
-    t =
-      let t0 = tc - thc
-      in if t0 > 0
-           then t0
-           else tc + thc
-    tc = l .* (direction ray) -- tc: vector from ray orig to sphere center projected on the ray
-    r2 =
-      let r = radius sphere
-      in fromIntegral $ r ^ 2
-    d2 = norm l ^ 2 - tc ^ 2 -- d2: squared distance from sphere center to ray
-    l = (center sphere) <-> (orig ray) :: Vector -- l: vector from ray orig to sphere center
-    thc = sqrt $ r2 - d2 -- thc: radius projected on the ray
-    pointAt t = (orig ray) <+> (direction ray .^ t)
-
-square number = number * number
-
 width = 800
 
 height = 600
@@ -118,10 +81,6 @@ closest intersections =
   where
     distanceFromOrigin intersection =
       norm (cameraSource <-> (point intersection))
-
-intersections :: Int -> Int -> [Sphere] -> [Intersection]
-intersections x y spheres =
-  catMaybes $ map (intersection (cameraRay x y)) spheres
 
 triangleIntersections x y =
   catMaybes $ map (triangleIntersection (cameraRay x y)) triangles
