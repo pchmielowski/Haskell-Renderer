@@ -27,7 +27,7 @@ cameraTarget x y =
     height' = fromIntegral height
 
 light :: Vector
-light = (10, 10, -40)
+light = (10, 0, 2)
 
 data Ray = Ray
   { orig :: Vector
