@@ -41,8 +41,8 @@ data Intersection = Intersection
 
 type Triangle = [Vector]
 
-triangleIntersection :: Ray -> Triangle -> Maybe Intersection
-triangleIntersection ray triangle =
+intersection :: Ray -> Triangle -> Maybe Intersection
+intersection ray triangle =
   if a > -eps && a < eps
     then Nothing
     else if u < 0 || u > 1
@@ -84,12 +84,10 @@ closest [] = Nothing
 closest intersections =
   Just $ minimumBy (comparing distanceFromOrigin) intersections
   where
-    distanceFromOrigin intersection =
-      norm (cameraSource <-> (point intersection))
+    distanceFromOrigin = norm . (cameraSource <->) . point
 
-triangleIntersections :: Int -> Int -> [Intersection]
-triangleIntersections x y =
-  catMaybes $ map (triangleIntersection (cameraRay x y)) triangles
+intersections :: Int -> Int -> [Intersection]
+intersections x y = catMaybes $ map (intersection (cameraRay x y)) triangles
   where
     triangles = concat [cone, ground]
     cone =
@@ -111,7 +109,7 @@ triangleIntersections x y =
     z0 = -2
 
 pixel :: Int -> Int -> [Int]
-pixel x y = take 3 $ repeat $ color $ closest $ triangleIntersections x y
+pixel x y = take 3 $ repeat $ color $ closest $ intersections x y
   where
     color intersection =
       case intersection of
