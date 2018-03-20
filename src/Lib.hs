@@ -27,7 +27,7 @@ cameraTarget x y =
     height' = fromIntegral height
 
 light :: Vector
-light = (10, 0, 2)
+light = (20, 10, -1)
 
 data Ray = Ray
   { orig :: Vector
@@ -90,7 +90,7 @@ closest intersections =
 intersections :: Ray -> [Triangle] -> [Intersection]
 intersections = (catMaybes .) . map . intersection
 
-triangles = concat [cone, ground]
+triangles = concat [cone, ground, wall]
   where
     cone =
       [ [(0, 0, z1), (-1, -1, z0), (0, -r, z0)]
@@ -106,6 +106,10 @@ triangles = concat [cone, ground]
       [ [(-2, -2, z0), (2, 2, z0), (-2, 2, z0)]
       , [(-2, -2, z0), (2, -2, z0), (2, 2, z0)]
       ]
+    wall =
+      [ [(2, -2, 2), (2, 2, z0), (2, -2, z0)]
+      , [(2, 2, 2), (2, -2, 2), (2, 2, z0)]
+      ]
     r = sqrt 2
     z1 = 0
     z0 = -2
@@ -117,10 +121,16 @@ pixel x y =
     color intersection =
       case intersection of
         Just it ->
-          let intensity = (normal it) .* (lightDirection light (point it))
-          in max 0 $ 128 + (round $ intensity * 128)
+          let intensity =
+                if isInShadow $ point it
+                  then 0
+                  else (normal it) .* (lightDirection (point it))
+          in max 0 $ round $ intensity * 256
         Nothing -> 0
-    lightDirection = (normalize .) . (<->)
+    direction = (normalize .) . (<->)
+    lightDirection = direction light
+    lightRay point = Ray light $ lightDirection point -- .^ (-1)
+    isInShadow point = False --not $ null $ intersections (lightRay point) triangles
 
 row :: Int -> [Int]
 row y = concat $ map (\x -> pixel x y) [1 .. width]
