@@ -1,3 +1,4 @@
 #!/bin/sh
 
-stack build && stack exec raytracer-exe # && eog image.ppm
+stack build --ghc-options="-Wall -Werror" && stack exec raytracer-exe # && eog image.ppm
+
