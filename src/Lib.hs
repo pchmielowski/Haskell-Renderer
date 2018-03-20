@@ -39,7 +39,7 @@ spheres =
   , Sphere (-3, -3, -40) 1 -- should be hidden behind the previous one
   ]
 
-light = (0, 8, -20) :: Vector
+light = (10, 10, -40) :: Vector
 
 data Ray = Ray
   { orig :: Vector
@@ -77,7 +77,7 @@ triangleIntersection ray triangle =
     v = f * ((direction ray) .* q)
     t = f * (edge2 .* q)
     point = ((orig ray) <+> (direction ray) .^ t)
-    normal = edge1 >< edge2
+    normal = normalize $ edge1 >< edge2
 
 intersection :: Ray -> Sphere -> Maybe Intersection
 intersection ray sphere =
