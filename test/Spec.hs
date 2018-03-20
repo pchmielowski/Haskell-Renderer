@@ -7,9 +7,16 @@ import Lib
 
 main :: IO ()
 main = do
-  defaultMain (testGroup "Our Library Tests" [add5Test])
+  defaultMain $
+    testGroup
+      "Our Library Tests"
+      [ testCase "parseVertex" $
+        assertEqual "" (0, 0, 0) $ parseVertex "v 0 0 0"
+      , testCase "parseVertex" $
+        assertEqual "" (1, 2, 3) $ parseVertex "v 1 2 3"
+      ]
 
-add5Test :: TestTree
-add5Test =
-  testCase "Testing add5" (assertEqual "Should add 5 to get 10" 10 (add5 5))
-
+parseVertex raw = (parse 0, parse 1, parse 2)
+  where
+    splitted = (tail . words) raw
+    parse = read . (splitted !!)
