@@ -87,8 +87,8 @@ closest intersections =
   where
     distanceFromOrigin = norm . (cameraSource <->) . point
 
-intersections :: Int -> Int -> [Intersection]
-intersections x y = catMaybes $ map (intersection (cameraRay x y)) triangles
+intersections :: Ray -> [Triangle] -> [Intersection]
+intersections = (catMaybes .) . map . intersection
 
 triangles = concat [cone, ground]
   where
@@ -111,7 +111,8 @@ triangles = concat [cone, ground]
     z0 = -2
 
 pixel :: Int -> Int -> [Int]
-pixel x y = take 3 $ repeat $ color $ closest $ intersections x y
+pixel x y =
+  take 3 $ repeat $ color $ closest $ intersections (cameraRay x y) triangles
   where
     color intersection =
       case intersection of
