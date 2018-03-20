@@ -89,8 +89,9 @@ closest intersections =
 
 intersections :: Int -> Int -> [Intersection]
 intersections x y = catMaybes $ map (intersection (cameraRay x y)) triangles
+
+triangles = concat [cone, ground]
   where
-    triangles = concat [cone, ground]
     cone =
       [ [(0, 0, z1), (-1, -1, z0), (0, -r, z0)]
       , [(0, 0, z1), (0, -r, z0), (1, -1, z0)]
