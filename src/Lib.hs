@@ -91,7 +91,8 @@ triangleIntersections :: Int -> Int -> [Intersection]
 triangleIntersections x y =
   catMaybes $ map (triangleIntersection (cameraRay x y)) triangles
   where
-    triangles =
+    triangles = concat [cone, ground]
+    cone =
       [ [(0, 0, z1), (-1, -1, z0), (0, -r, z0)]
       , [(0, 0, z1), (0, -r, z0), (1, -1, z0)]
       , [(0, 0, z1), (1, -1, z0), (r, 0, z0)]
@@ -100,6 +101,10 @@ triangleIntersections x y =
       , [(0, 0, z1), (0, r, z0), (-1, 1, z0)]
       , [(0, 0, z1), (-1, 1, z0), (-r, 0, z0)]
       , [(0, 0, z1), (-r, 0, z0), (-1, -1, z0)]
+      ]
+    ground =
+      [ [(-2, -2, z0), (2, 2, z0), (-2, 2, z0)]
+      , [(-2, -2, z0), (2, -2, z0), (2, 2, z0)]
       ]
     r = sqrt 2
     z1 = 0
