@@ -51,6 +51,35 @@ data Intersection = Intersection
   , normal :: Vector
   }
 
+type Triangle = [Vector]
+
+triangleIntersection :: Ray -> Triangle -> Maybe Intersection
+triangleIntersection ray triangle =
+  if a > -eps && a < eps
+    then Nothing
+    else if u < 0 || u > 1
+           then Nothing
+           else if v < 0 || u + v > 1
+                  then Nothing
+                  else if t > eps
+                         then Just $
+                              Intersection
+                                ((orig ray) <+> (direction ray) .^ t)
+                                (0, 0, 0) -- TODO calculate normal
+                         else Nothing
+  where
+    eps = 0.0000001
+    edge1 = triangle !! 1 <-> (triangle !! 0)
+    edge2 = triangle !! 2 <-> (triangle !! 0)
+    h = direction ray >< edge2
+    a = edge1 .* h
+    f = 1 / a
+    s = orig ray <-> (triangle !! 0)
+    u = f * (s .* h)
+    q = s >< edge1
+    v = f * ((direction ray) .* q)
+    t = f * (edge2 .* q)
+
 intersection :: Ray -> Sphere -> Maybe Intersection
 intersection ray sphere =
   if tc >= 0 && d2 <= r2
