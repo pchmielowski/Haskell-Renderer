@@ -64,7 +64,7 @@ triangleIntersection ray triangle =
                   else if t > eps
                          then Just $
                               Intersection
-                                ((orig ray) <+> (direction ray) .^ t)
+                                point
                                 (0, 0, 0) -- TODO calculate normal
                          else Nothing
   where
@@ -79,6 +79,7 @@ triangleIntersection ray triangle =
     q = s >< edge1
     v = f * ((direction ray) .* q)
     t = f * (edge2 .* q)
+    point = ((orig ray) <+> (direction ray) .^ t)
 
 intersection :: Ray -> Sphere -> Maybe Intersection
 intersection ray sphere =
@@ -124,14 +125,22 @@ intersections :: Int -> Int -> [Sphere] -> [Intersection]
 intersections x y spheres =
   catMaybes $ map (intersection (cameraRay x y)) spheres
 
+triangleIntersections x y =
+  catMaybes $ map (triangleIntersection (cameraRay x y)) triangles
+  where
+    triangles =
+      [ [(-3, 3, -30), (-3, -3, -30), (3, 3, -30)]
+      , [(3, -3, -30), (-3, -3, -30), (3, 3, -30)]
+      ]
+
 pixel :: Int -> Int -> [Int]
-pixel x y = take 3 $ repeat $ color $ closest $ intersections x y spheres
+pixel x y = take 3 $ repeat $ color $ closest $ triangleIntersections x y
   where
     color intersection =
       case intersection of
         Just it ->
           let intensity = (normal it) .* (lightDirection (point it))
-          in max 0 $ round $ intensity * 255
+          in 255 -- max 0 $ round $ intensity * 255
         Nothing -> 0
     lightDirection point = normalize $ light <-> point
 
