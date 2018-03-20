@@ -41,6 +41,7 @@ data Intersection = Intersection
 
 type Triangle = [Vector]
 
+-- source: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 intersection :: Ray -> Triangle -> Maybe Intersection
 intersection ray triangle =
   if a > -eps && a < eps
