@@ -10,17 +10,17 @@ import Data.Vec3
 type Vector = TVec3
 
 cameraSource :: Vector
-cameraSource = (0, 0, 0)
+cameraSource = (0, 5, 0)
 
 cameraTarget :: Int -> Int -> Vector
 cameraTarget x y =
   normalize
     ( (2 * ((x' + 0.5) / width') - 1) * angle * width' / height'
-    , (1 - 2 * (y' + 0.5) / height') * angle
-    , -1)
+    , -1
+    , (1 - 2 * (y' + 0.5) / height') * angle)
   where
     angle = tan $ pi * 0.5 * fieldOfView / 180
-    fieldOfView = 5
+    fieldOfView = 60
     x' = fromIntegral x
     y' = fromIntegral y
     width' = fromIntegral width
@@ -137,9 +137,8 @@ triangleIntersections x y =
       , [(0, 0, z1), (-r, 0, z0), (-1, -1, z0)]
       ]
     r = sqrt 2
-    z1 = -30
-    z0 = z1 - h
-    h = 10
+    z1 = 0
+    z0 = -2
 
 pixel :: Int -> Int -> [Int]
 pixel x y = take 3 $ repeat $ color $ closest $ triangleIntersections x y
