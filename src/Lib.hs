@@ -2,6 +2,7 @@ module Lib
   ( someFunc
   , add5
   , Vector
+  , Triangle
   ) where
 
 import Data.List
