@@ -1,6 +1,7 @@
 module Lib
   ( someFunc
   , add5
+  , Vector
   ) where
 
 import Data.List
