@@ -1,6 +1,5 @@
 module Lib
   ( someFunc
-  , add5
   , Vector
   , Triangle
   ) where
@@ -104,9 +103,13 @@ triangles = concat [cone, ground, wall]
       , [(0, 0, z1), (-r, 0, z0), (-1, -1, z0)]
       ]
     ground =
-      [ [(-2, -2, z0), (2, 2, z0), (-2, 2, z0)]
-      , [(-2, -2, z0), (2, -2, z0), (2, 2, z0)]
-      ]
+      parseTriangles
+        "v -2 -2 -2\n\
+        \v 2 2 -2\n\
+        \v -2 2 -2\n\
+        \v 2 -2 -2\n\
+        \f 1 2 3\n\
+        \f 1 4 2"
     wall =
       [ [(2, -2, 2), (2, 2, z0), (2, -2, z0)]
       , [(2, 2, 2), (2, -2, 2), (2, 2, z0)]
