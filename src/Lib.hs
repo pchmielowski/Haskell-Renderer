@@ -90,32 +90,8 @@ closest intersections =
 intersections :: Ray -> [Triangle] -> [Intersection]
 intersections = (catMaybes .) . map . intersection
 
-triangles = concat [cone]
-  where
-    cone =
-      parseTriangles
-        "v 0 0 0\n\
-        \v 1.4142 0 -2\n\
-        \v 1 1 -2\n\
-        \v 0 1.4142 -2\n\
-        \v -1 1 -2\n\
-        \f 1 2 3\n\
-        \f 1 3 4\n\
-        \f 1 4 5\n\
-        \f 1 5 2\n\
-        \\
-        \v -2 -2 -2\n\
-        \v 2 2 -2\n\
-        \v -2 2 -2\n\
-        \v 2 -2 -2\n\
-        \f 6 7 8\n\
-        \f 6 9 7"
-    r = sqrt 2
-    z1 = 0
-    z0 = -2
-
-pixel :: Int -> Int -> [Int]
-pixel x y =
+pixel :: Int -> Int -> [Triangle] -> [Int]
+pixel x y triangles =
   take 3 $ repeat $ color $ closest $ intersections (cameraRay x y) triangles
   where
     color intersection =
@@ -132,18 +108,19 @@ pixel x y =
     lightRay point = Ray light $ lightDirection point -- .^ (-1)
     isInShadow point = False --not $ null $ intersections (lightRay point) triangles
 
-row :: Int -> [Int]
-row y = concat $ map (\x -> pixel x y) [1 .. width]
+row :: [Triangle] -> Int -> [Int]
+row triangles y = concat $ map (\x -> pixel x y triangles) [1 .. width]
 
-image :: [Int]
-image = concat $ map row [1 .. height]
+image :: [Triangle] -> [Int]
+image = ([1 .. height] >>=) . row
 
-body :: String
-body = intercalate " " $ map show $ image
+body :: [Triangle] -> String
+body = intercalate " " . map show . image
 
-content :: String
-content = header ++ body
+content :: [Triangle] -> String
+content triangles = header ++ (body triangles)
 
 someFunc :: IO ()
 someFunc = do
-  writeFile "image.ppm" content
+  obj <- readFile "example.obj"
+  writeFile "image.ppm" $ content $ parseTriangles obj
