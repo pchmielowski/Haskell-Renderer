@@ -30,7 +30,7 @@ cameraTarget x y =
     height' = fromIntegral height
 
 light :: Vector
-light = (20, 10, 0)
+light = (10, 0, 20)
 
 data Ray = Ray
   { orig :: Vector
@@ -102,7 +102,7 @@ pixel x y triangles =
                 if isInShadow $ point it
                   then 0
                   else (normal it) .* (lightDirection (point it))
-          in max 0 $ 128 + (round $ intensity * 128)
+          in max 0 $ round $ intensity * 255
         Nothing -> 0
     direction = (normalize .) . (<->)
     lightDirection = direction light
