@@ -90,7 +90,7 @@ closest intersections =
 intersections :: Ray -> [Triangle] -> [Intersection]
 intersections = (catMaybes .) . map . intersection
 
-triangles = concat [cone, ground]
+triangles = concat [cone]
   where
     cone =
       parseTriangles
@@ -102,15 +102,14 @@ triangles = concat [cone, ground]
         \f 1 2 3\n\
         \f 1 3 4\n\
         \f 1 4 5\n\
-        \f 1 5 2"
-    ground =
-      parseTriangles
-        "v -2 -2 -2\n\
+        \f 1 5 2\n\
+        \\
+        \v -2 -2 -2\n\
         \v 2 2 -2\n\
         \v -2 2 -2\n\
         \v 2 -2 -2\n\
-        \f 1 2 3\n\
-        \f 1 4 2"
+        \f 6 7 8\n\
+        \f 6 9 7"
     r = sqrt 2
     z1 = 0
     z0 = -2
