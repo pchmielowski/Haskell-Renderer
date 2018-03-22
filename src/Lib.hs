@@ -1,7 +1,6 @@
 module Lib
-  ( someFunc
-  , Vector
-  , Triangle
+  ( content
+  , parseTriangles
   ) where
 
 import Common
@@ -10,7 +9,6 @@ import Data.Maybe
 import Data.Ord
 import Data.Vec3
 import Reader
-import System.Environment
 
 cameraSource :: Vector
 cameraSource = (0, 0, 5)
@@ -120,9 +118,3 @@ body = intercalate " " . map show . image
 
 content :: [Triangle] -> String
 content triangles = header ++ (body triangles)
-
-someFunc :: IO ()
-someFunc = do
-  args <- getArgs
-  obj <- readFile $ args !! 0
-  writeFile "image.ppm" $ content $ parseTriangles obj
