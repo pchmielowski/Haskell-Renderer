@@ -2,3 +2,4 @@
 raytracer.cabal
 *~
 *.ppm
+*.mtl
