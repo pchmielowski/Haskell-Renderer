@@ -1,6 +1,5 @@
 module Lib
   ( content
-  , parseTriangles
   ) where
 
 import Common

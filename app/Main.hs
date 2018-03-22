@@ -1,6 +1,7 @@
 module Main where
 
 import Lib
+import Reader
 
 import System.Environment
 
