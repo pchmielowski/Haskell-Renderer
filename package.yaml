@@ -26,6 +26,7 @@ library:
   source-dirs: src
   dependencies:
     - simple-vec3
+    - split
 
 executables:
   raytracer-exe:

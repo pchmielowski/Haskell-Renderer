@@ -24,7 +24,7 @@ main = do
       , testCase "parse multiple vertices" $
         assertEqual "" [(1, 2, 3), (9, 8, 7)] $
         parseVertices "v 1 2 3\nv 9 8 7\nf 1 2 3\n l 5 3 1"
-      , testCase "parse face" $ assertEqual "" [1, 2, 3] $ parseFace "f 1 2 3"
+      , testCase "parse face" $ assertEqual "" [1, 2, 3] $ parseFace "f 1//4 2//4 3//4"
       , testCase "parse faces" $
         assertEqual "" [[1, 2, 3], [0, 1, 2]] $
         parseFaces "v 0 0 0\nf 1 2 3\nf 0 1 2\n"
