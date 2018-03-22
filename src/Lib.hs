@@ -90,18 +90,19 @@ closest intersections =
 intersections :: Ray -> [Triangle] -> [Intersection]
 intersections = (catMaybes .) . map . intersection
 
-triangles = concat [cone, ground, wall]
+triangles = concat [cone, ground]
   where
     cone =
-      [ [(0, 0, z1), (-1, -1, z0), (0, -r, z0)]
-      , [(0, 0, z1), (0, -r, z0), (1, -1, z0)]
-      , [(0, 0, z1), (1, -1, z0), (r, 0, z0)]
-      , [(0, 0, z1), (r, 0, z0), (1, 1, z0)]
-      , [(0, 0, z1), (1, 1, z0), (0, r, z0)]
-      , [(0, 0, z1), (0, r, z0), (-1, 1, z0)]
-      , [(0, 0, z1), (-1, 1, z0), (-r, 0, z0)]
-      , [(0, 0, z1), (-r, 0, z0), (-1, -1, z0)]
-      ]
+      parseTriangles
+        "v 0 0 0\n\
+        \v 1.4142 0 -2\n\
+        \v 1 1 -2\n\
+        \v 0 1.4142 -2\n\
+        \v -1 1 -2\n\
+        \f 1 2 3\n\
+        \f 1 3 4\n\
+        \f 1 4 5\n\
+        \f 1 5 2"
     ground =
       parseTriangles
         "v -2 -2 -2\n\
@@ -110,10 +111,6 @@ triangles = concat [cone, ground, wall]
         \v 2 -2 -2\n\
         \f 1 2 3\n\
         \f 1 4 2"
-    wall =
-      [ [(2, -2, 2), (2, 2, z0), (2, -2, z0)]
-      , [(2, 2, 2), (2, -2, 2), (2, 2, z0)]
-      ]
     r = sqrt 2
     z1 = 0
     z0 = -2
