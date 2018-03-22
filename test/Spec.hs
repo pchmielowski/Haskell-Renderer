@@ -53,6 +53,7 @@ main = do
           \f 2 3 5"
       ]
 
+parseVertex :: String -> Vector
 parseVertex raw = (parse 0, parse 1, parse 2)
   where
     splitted = (tail . words) raw
