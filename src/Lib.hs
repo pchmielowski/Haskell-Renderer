@@ -5,14 +5,12 @@ module Lib
   , Triangle
   ) where
 
+import Common
 import Data.List
 import Data.Maybe
 import Data.Ord
 import Data.Vec3
-
-add5 = (5 +)
-
-type Vector = TVec3
+import Reader
 
 cameraSource :: Vector
 cameraSource = (0, 5, 0)
@@ -43,8 +41,6 @@ data Intersection = Intersection
   { point :: Vector
   , normal :: Vector
   }
-
-type Triangle = [Vector]
 
 -- source: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 intersection :: Ray -> Triangle -> Maybe Intersection

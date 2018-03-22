@@ -1,6 +1,6 @@
 module Reader where
 
-import Lib
+import Common
 
 parseVertex :: String -> Vector
 parseVertex raw = (parse 0, parse 1, parse 2)
