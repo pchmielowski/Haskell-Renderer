@@ -53,9 +53,7 @@ parseFaces = map parseFace . filter isFace . lines
     isFace = ('f' ==) . head
 
 parseTriangles :: String -> [Triangle]
-parseTriangles raw = map toTriangle $ parseFaces raw
+parseTriangles raw = map (toTriangle raw) $ parseFaces raw
   where
-    vertices = parseVertices raw
-    toTriangle :: Face -> Triangle
-    toTriangle = map chooseVertex
-    chooseVertex = (vertices !!) . subtract 1
+    toTriangle :: String -> Face -> Triangle
+    toTriangle = map . (. subtract 1) . (!!) . parseVertices
