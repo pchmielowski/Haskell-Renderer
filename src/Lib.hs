@@ -10,26 +10,27 @@ import Data.Maybe
 import Data.Ord
 import Data.Vec3
 import Reader
+import System.Environment
 
 cameraSource :: Vector
-cameraSource = (0, 5, 0)
+cameraSource = (0, 0, 5)
 
 cameraTarget :: Int -> Int -> Vector
 cameraTarget x y =
   normalize
     ( (2 * ((x' + 0.5) / width') - 1) * angle * width' / height'
-    , -1
-    , (1 - 2 * (y' + 0.5) / height') * angle)
+    , (1 - 2 * (y' + 0.5) / height') * angle
+    , -1)
   where
     angle = tan $ pi * 0.5 * fieldOfView / 180
-    fieldOfView = 60
+    fieldOfView = 30
     x' = fromIntegral x
     y' = fromIntegral y
     width' = fromIntegral width
     height' = fromIntegral height
 
 light :: Vector
-light = (20, 10, -1)
+light = (20, 10, 0)
 
 data Ray = Ray
   { orig :: Vector
@@ -69,10 +70,10 @@ intersection ray triangle =
     nrml = normalize $ edge1 >< edge2
 
 width :: Int
-width = 800
+width = 200
 
 height :: Int
-height = 600
+height = 150
 
 header :: String
 header = "P3\n" ++ show (width) ++ " " ++ show (height) ++ "\n255\n"
@@ -101,7 +102,7 @@ pixel x y triangles =
                 if isInShadow $ point it
                   then 0
                   else (normal it) .* (lightDirection (point it))
-          in max 0 $ round $ intensity * 256
+          in max 0 $ 128 + (round $ intensity * 128)
         Nothing -> 0
     direction = (normalize .) . (<->)
     lightDirection = direction light
@@ -122,5 +123,6 @@ content triangles = header ++ (body triangles)
 
 someFunc :: IO ()
 someFunc = do
-  obj <- readFile "example.obj"
+  args <- getArgs
+  obj <- readFile $ args !! 0
   writeFile "image.ppm" $ content $ parseTriangles obj
