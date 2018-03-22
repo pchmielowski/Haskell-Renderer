@@ -30,6 +30,27 @@ main = do
       , testCase "parse vertices and face" $
         assertEqual "" [[(1, 2, 3), (9, 8, 7), (0, 0, 0)]] $
         parseTriangles "v 1 2 3\nv 9 8 7\nv 0 0 0\nf 1 2 3"
+      , testCase "parse empty file" $ assertEqual "" [] $ parseTriangles ""
+      , testCase "parse file with vertices only" $
+        assertEqual "" [] $ parseTriangles "v 1 2 3\nv 9 8 7\n"
+      , testCase "parse file" $
+        assertEqual
+          ""
+          [ [(0, 0, 0), (1, 1, 1), (0, 0, 1)]
+          , [(0, 0, 1), (1, 1, 1), (0, 0, 0)]
+          , [(1, 0, 0), (4, 2, 5), (0, 0, 0)]
+          , [(1, 1, 1), (0, 0, 1), (4, 2, 5)]
+          ] $
+        parseTriangles
+          "v 0 0 0\n\
+          \v 1 1 1\n\
+          \v 0 0 1\n\
+          \v 1 0 0\n\
+          \v 4 2 5\n\
+          \f 1 2 3\n\
+          \f 3 2 1\n\
+          \f 4 5 1\n\
+          \f 2 3 5"
       ]
 
 parseVertex raw = (parse 0, parse 1, parse 2)
